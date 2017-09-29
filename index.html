@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="Files/style.css" rel="stylesheet" />
+    <script src="Common/utility.js"></script>
+    <script src="Core/vector.js"></script>
+    <script src="Entities/Base/unit.js"></script>
+    <script src="Entities/crab.js"></script>
+    <script src="Entities/hungrycrab.js"></script>
+    <script src="Entities/egg.js"></script>
+    <script src="Entities/murky.js"></script>
+    <script src="Core/gamescene.js"></script>
+    <script src="Core/imagecache.js"></script>
+    <script src="Core/gamescreen.js"></script>
+    <script src="Core/gamemanager.js"></script>
+    <script>
+        var Game;
+
+        $(function Launch() {
+            var acc = {x:0, y:0};
+            Game = new GameManager();
+            Game.Initialize();
+            Game.Start(100, 50, function(game, scene) {
+                var score = 0;
+                var crabsNumber = 3; 
+                var next = {x:0, y:0};
+
+                for(var i = crabsNumber; i--;)
+                {
+                    var xMod = Math.random();
+                    var yMod = Math.random();
+                    next.x =  1280 * xMod;
+                    next.y =  720 * yMod;
+                    scene.Entities.push(new Crab(1280 * xMod,720 * yMod));
+                    
+                }
+
+                var xMod = Math.random();
+                var yMod = Math.random();
+                murky = new Murky(1280 * xMod,720 * yMod);
+                var egg = new Egg(next.x, next.y);
+
+                scene.Entities.push(murky);
+                scene.Entities.push(egg);
+
+                var timer = setInterval(function(){
+                    if (crabsNumber % 10 == 0){
+                        scene.Entities.push(new HungryCrab(next.x,next.y));
+                    }
+                    else{
+                        scene.Entities.push(new Crab(next.x,next.y));
+                    }
+
+                    var xMod = Math.random();
+                    var yMod = Math.random();
+                    next.x =  1280 * xMod;
+                    next.y =  720 * yMod;
+
+                    egg.x = next.x;
+                    egg.y = next.y;
+
+                    crabsNumber++;
+                    score += crabsNumber;
+                    $("#scoreMeter").html("Score: "+score);
+                }, 1000);
+
+                Game.OnStop = function(){ clearInterval(timer); };
+            });
+
+            window.onmousemove = function (event) {
+                acc.x = event.clientX;
+                acc.y = event.clientY;
+            }
+        });
+    </script>
+</head>
+<body id="body">
+
+    <div id="fpsMeter"></div>
+    <div id="scoreMeter"></div>
+    
+    <canvas id="canvas"></canvas>
+
+</body>
+</html>
