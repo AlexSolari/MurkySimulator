@@ -7,6 +7,7 @@
     <link href="Files/style.css" rel="stylesheet" />
     <script src="Common/utility.js"></script>
     <script src="Core/vector.js"></script>
+    <script src="Core/event.js"></script>
     <script src="Entities/Base/unit.js"></script>
     <script src="Entities/crab.js"></script>
     <script src="Entities/hungrycrab.js"></script>
@@ -23,41 +24,41 @@
             var acc = {x:0, y:0};
             Game = new GameManager();
             Game.Initialize();
-            Game.Start(100, 50, function(game, scene) {
+            Game.DebugMode = true;
+            Game.Start(144, 60, function(game, scene) {
+                var randomPoint = function() {
+                    return { x:1280 * Math.random(), y:720 * Math.random() };
+                };
+
                 var score = 0;
                 var crabsNumber = 3; 
-                var next = {x:0, y:0};
+                var next = randomPoint();
 
                 for(var i = crabsNumber; i--;)
                 {
-                    var xMod = Math.random();
-                    var yMod = Math.random();
-                    next.x =  1280 * xMod;
-                    next.y =  720 * yMod;
-                    scene.Entities.push(new Crab(1280 * xMod,720 * yMod));
-                    
+                    scene.Entities.push( new Crab( next.x, next.y ) );
+                    next = randomPoint();
                 }
 
-                var xMod = Math.random();
-                var yMod = Math.random();
-                murky = new Murky(1280 * xMod,720 * yMod);
-                var egg = new Egg(next.x, next.y);
+                murky = new Murky( next.x, next.y );
+
+                next = randomPoint();
+                var egg = new Egg( next.x, next.y );
 
                 scene.Entities.push(murky);
                 scene.Entities.push(egg);
 
-                var timer = setInterval(function(){
+                var mainEvent = new Event();
+                mainEvent.Handler = function MainEventHandler(){
+                    
                     if (crabsNumber % 10 == 0){
                         scene.Entities.push(new HungryCrab(next.x,next.y));
                     }
                     else{
                         scene.Entities.push(new Crab(next.x,next.y));
                     }
-
-                    var xMod = Math.random();
-                    var yMod = Math.random();
-                    next.x =  1280 * xMod;
-                    next.y =  720 * yMod;
+                    
+                    next = randomPoint();
 
                     egg.x = next.x;
                     egg.y = next.y;
@@ -65,9 +66,16 @@
                     crabsNumber++;
                     score += crabsNumber;
                     $("#scoreMeter").html("Score: "+score);
-                }, 1000);
+                };
+                mainEvent.Finite = false;
+                mainEvent.Period = 60;
 
-                Game.OnStop = function(){ clearInterval(timer); };
+                scene.EventQueue.push(mainEvent);
+
+                Game.OnStop = function(){
+                     mainEvent.Finite = true;
+                     mainEvent.InvokeCounter = 0; 
+                };
             });
 
             window.onmousemove = function (event) {

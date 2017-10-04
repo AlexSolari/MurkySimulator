@@ -14,12 +14,15 @@ function GameManager() {
 
     this.CurrentSecondNumber = 0;
     this.CurrentFrameNumber = 0;
+    this.CurrentTickNumber = 0;
     this.LastSecondFrameNumber = 0;
     this.ImageCache = null;
     this.Screen = null;
     this.Cursor = {x:1, y:1};
     this.MurkyPosition = {x:0,y:0};
     this.DebugMode = false;
+    this.InitializerCallback = function() {};
+    this.FPS = 0;
 }
 
 GameManager.prototype.GetTopScene = function GetTopScene() {
@@ -27,7 +30,13 @@ GameManager.prototype.GetTopScene = function GetTopScene() {
 }
 
 GameManager.prototype.Restart = function Restart(size, targetFPS) {
-    this.Start(size, targetFPS);
+    this.CurrentSecondNumber = 0;
+    this.CurrentFrameNumber = 0;
+    this.CurrentTickNumber = 0;
+    this.LastSecondFrameNumber = 0;
+    this.MurkyPosition = {x:0,y:0};
+    this.Scenes = [];
+    this.Start(size, targetFPS, this.InitializerCallback);
 }
 
 GameManager.prototype.Initialize = function Initialize() {
@@ -58,13 +67,16 @@ GameManager.prototype.Start = function Start(targetFPS, targetTickrate, initiali
     this.Scenes = [];
     this.Scenes.push(new GameScene(self.Screen));
 
+    this.InitializerCallback = initializerCallback;
+
     initializerCallback(this, this.GetTopScene());
 
     clearInterval(this.UpdateIntervalID);
     clearInterval(this.RenderIntervalID);
 
     this.UpdateIntervalID = setInterval(function GameUpdateLoop() {
-        self.GetTopScene().UpdateScene();
+        self.CurrentTickNumber += 1;
+        self.GetTopScene().UpdateScene(self.CurrentTickNumber);
     }, 1000 / targetTickrate);
     this.RenderIntervalID = setInterval(function GameRenderLoop() {
         self.CountFPS();
@@ -74,7 +86,8 @@ GameManager.prototype.Start = function Start(targetFPS, targetTickrate, initiali
 
 GameManager.prototype.CountFPS = function CountFPS() {
     if (this.CurrentSecondNumber != new Date().getSeconds()) {
-        $("#fpsMeter").html(this.CurrentFrameNumber - this.LastSecondFrameNumber + "fps");
+        this.FPS = this.CurrentFrameNumber - this.LastSecondFrameNumber;
+        $("#fpsMeter").html(this.FPS + "fps");
         this.LastSecondFrameNumber = this.CurrentFrameNumber;
         this.CurrentSecondNumber = new Date().getSeconds();
     }

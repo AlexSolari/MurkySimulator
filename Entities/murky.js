@@ -11,7 +11,7 @@ function Murky(x, y){
 
 Murky.prototype = Object.create(Unit.prototype);
 
-Murky.prototype.Update = function(enviroment){
+Murky.prototype.Update = function Update(enviroment){
     Unit.prototype.Update.call(this, enviroment);
 
     this.acceleration = this.acceleration.Add(new Vector(this.x, this.y, Game.Cursor.x, Game.Cursor.y));
@@ -24,5 +24,5 @@ Murky.prototype.OnCollision = function OnCollision(entity, forceInvoked) {
     Unit.prototype.OnCollision.call(this, entity, forceInvoked);
 
     alert("GAME LOST!");
-    Game.Stop();
+    Game.Restart(144, 60);
 }

@@ -13,7 +13,7 @@ function HungryCrab(x, y){
 
 HungryCrab.prototype = Object.create(Unit.prototype);
 
-HungryCrab.prototype.Update = function(enviroment){
+HungryCrab.prototype.Update = function Update(enviroment){
     this.acceleration = this.acceleration.Add(new Vector(this.x, this.y, Game.MurkyPosition.x, Game.MurkyPosition.y));
 
     this.acceleration.Limit(3);

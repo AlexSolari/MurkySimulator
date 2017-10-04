@@ -6,6 +6,7 @@ function GameScene(screen)
         GravityForce: new Vector(0, 0, 0, 0.01),
         Viscosity: 0.99,
     };
+    this.EventQueue = [];
 }
 
 GameScene.prototype.Add = function Add(entity) {
@@ -17,7 +18,7 @@ GameScene.prototype.Clear = function Clear() {
     this.Screen.clearRect(0, 0, this.Screen.Width, this.Screen.Height);
 }
 
-GameScene.prototype.UpdateScene = function UpdateScene() {
+GameScene.prototype.UpdateScene = function UpdateScene(tickNumber) {
     var self = this;
 
     this.Entities.forEach(function EntityUpdate(entity) {
@@ -38,5 +39,16 @@ GameScene.prototype.UpdateScene = function UpdateScene() {
         entity.acceleration.RecalculateLength();
 
         entity.Update(self.Enviroment);
+    });
+
+    this.EventQueue.forEach(function EventInvoker(event){
+
+        if (tickNumber % event.Period == 0){
+            event.Handle();
+        }
+        
+    });
+    this.EventQueue = this.EventQueue.filter(function EventFilter(event){
+        return event.InvokeCounter > 0;
     });
 }

@@ -7,7 +7,7 @@ function Crab(x, y){
     this.isCollideable = true;
     this.isIntersectable = true;
     this.sprite = "crab";
-    this.speed = new Vector(s(10),s(10),s(10),s(10)).Limit(10);
+    this.speed = new Vector(s(5),s(5),s(5),s(5)).Limit(5, true);
 }
 
 Crab.prototype = Object.create(Unit.prototype);
@@ -15,5 +15,5 @@ Crab.prototype = Object.create(Unit.prototype);
 Crab.prototype.OnCollision = function OnCollision(entity, forceInvoked) {
     Unit.prototype.OnCollision.call(this, entity, forceInvoked);
 
-    this.speed = this.speed.Limit(7, true);
+    this.speed = this.speed.Limit(5, true);
 }
